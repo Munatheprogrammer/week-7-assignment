@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Task 3 - Event Propagation</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 40px 20px; }
+    .container { max-width: 600px; margin: 0 auto; }
+    h1 { font-size: 1.6rem; color: #222; margin-bottom: 8px; }
+    .description { font-size: 0.88rem; color: #666; margin-bottom: 30px; line-height: 1.6; }
+    #outer-box { background: #dcfce7; border: 2px solid #16a34a; border-radius: 12px; padding: 28px; cursor: pointer; }
+    #middle-box { background: #dbeafe; border: 2px solid #2563eb; border-radius: 10px; padding: 24px; cursor: pointer; }
+    #inner-box { background: #fef9c3; border: 2px solid #ca8a04; border-radius: 8px; padding: 20px; cursor: pointer; text-align: center; }
+    .box-label { font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+    .green-label { color: #16a34a; }
+    .blue-label { color: #2563eb; }
+    .yellow-label { color: #ca8a04; }
+    .stop-btn { padding: 10px 20px; background: #7c3aed; color: white; border: none; border-radius: 8px; font-size: 0.85rem; cursor: pointer; margin-top: 6px; }
+    .stop-btn:hover { background: #6d28d9; }
+    .log-area { margin-top: 24px; background: #1e1e1e; border-radius: 10px; padding: 20px; }
+    .log-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .log-title { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+    .clear-btn { padding: 4px 12px; background: #333; color: #888; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer; }
+    .clear-btn:hover { background: #444; }
+    #log { font-family: monospace; font-size: 0.85rem; color: #aaa; min-height: 60px; line-height: 1.9; }
+    .green-text { color: #4ade80; }
+    .blue-text { color: #60a5fa; }
+    .yellow-text { color: #facc15; }
+    .purple-text { color: #c084fc; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Event Propagation Demo</h1>
+    <p class="description">Click the boxes to see how events bubble upward. Click the purple button to see stopPropagation() stop the bubble.</p>
+
+    <div id="outer-box">
+      <p class="box-label green-label">Outer Box (Green)</p>
+
+      <div id="middle-box">
+        <p class="box-label blue-label">Middle Box (Blue)</p>
+
+        <div id="inner-box">
+          <p class="box-label yellow-label">Inner Box (Yellow) - click here</p>
+
+          <!--
+            This button uses stopPropagation().
+            Normally a click here would bubble up through:
+            inner box then middle box then outer box.
+            But stopPropagation() stops that from happening.
+            Only the button's own event listener will run.
+            According to the notebook provided
+          -->
+          <button class="stop-btn" id="stop-btn">stopPropagation Button</button>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="log-area">
+      <div class="log-top">
+        <span class="log-title">Event Log</span>
+        <button class="clear-btn" id="clear-btn">Clear</button>
+      </div>
+      <div id="log">Click a box to see the events...</div>
+    </div>
+  </div>
+
+  <script>
+    let log = document.getElementById("log");
+    let isFirstLog = true;
+
+    // helper to print a message to the log on screen
+    function printLog(message, colorClass) {
+      if (isFirstLog) {
+        log.innerHTML = "";
+        isFirstLog = false;
+      }
+
+      let line = document.createElement("div");
+      line.textContent = "-> " + message;
+      line.classList.add(colorClass);
+      log.appendChild(line);
+
+      console.log(message);
+    }
+
+    // outer box listener - fires last because bubbling reaches it last
+    document.getElementById("outer-box").addEventListener("click", function() {
+      printLog("Outer box received the event (bubbled up here)", "green-text");
+    });
+
+    // middle box listener
+    document.getElementById("middle-box").addEventListener("click", function() {
+      printLog("Middle box received the event (bubbled up here)", "blue-text");
+    });
+
+    // inner box listener - fires first when clicked
+    document.getElementById("inner-box").addEventListener("click", function() {
+      printLog("Inner box clicked - event starts here and bubbles up", "yellow-text");
+    });
+
+    /*
+      stopPropagation():
+      Without it, clicking this button would trigger all four listeners.
+      button then inner box then middle box then outer box.
+
+      With stopPropagation(), the event stops right here at the button.
+      The inner, middle, and outer box listeners never run.
+      According to the notebook provided
+    */
+    document.getElementById("stop-btn").addEventListener("click", function(e) {
+      e.stopPropagation();
+      printLog("Button clicked - stopPropagation() used. Bubble stopped here!", "purple-text");
+    });
+
+    // clear the log
+    document.getElementById("clear-btn").addEventListener("click", function(e) {
+      e.stopPropagation();
+      log.innerHTML = "Click a box to see the events...";
+      isFirstLog = true;
+    });
+  </script>
+</body>
+</html>
