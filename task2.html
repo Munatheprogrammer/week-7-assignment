@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Task 2 - To-Do List</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 40px 20px; }
+    .container { max-width: 560px; margin: 0 auto; background: white; padding: 32px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+    h1 { font-size: 1.6rem; color: #222; margin-bottom: 6px; }
+    .task-info { font-size: 0.85rem; color: #888; margin-bottom: 24px; }
+    .task-info span { font-weight: bold; color: #16a34a; }
+    .input-area { display: flex; gap: 10px; margin-bottom: 24px; }
+    input { flex: 1; padding: 11px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; outline: none; }
+    input:focus { border-color: #16a34a; }
+    .add-btn { padding: 11px 20px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 0.9rem; cursor: pointer; }
+    .add-btn:hover { background: #15803d; }
+    ul { list-style: none; }
+    li { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: #f9f9f9; border: 1px solid #eee; border-radius: 8px; margin-bottom: 8px; cursor: pointer; gap: 10px; }
+    li:hover { background: #f3f3f3; }
+    li.done { opacity: 0.5; text-decoration: line-through; }
+    .task-text { flex: 1; font-size: 0.9rem; color: #333; }
+    .delete-btn { padding: 5px 12px; background: #fee2e2; color: #dc2626; border: none; border-radius: 6px; font-size: 0.78rem; cursor: pointer; }
+    .delete-btn:hover { background: #fecaca; }
+    .empty-msg { text-align: center; color: #bbb; font-size: 0.88rem; padding: 20px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>To-Do List</h1>
+    <p class="task-info">Total tasks: <span id="total">0</span></p>
+    <div class="input-area">
+      <input type="text" id="task-input" placeholder="Type a task here..." />
+      <button class="add-btn" id="add-btn">Add</button>
+    </div>
+    <ul id="my-list">
+      <p class="empty-msg" id="empty-msg">No tasks yet. Add one above!</p>
+    </ul>
+  </div>
+
+  <script>
+    // bonus: store all tasks in an array
+    let allTasks = [];
+
+    let taskInput = document.getElementById("task-input");
+    let addBtn = document.getElementById("add-btn");
+    let myList = document.getElementById("my-list");
+    let totalDisplay = document.getElementById("total");
+    let emptyMsg = document.getElementById("empty-msg");
+
+    // update the task count on screen
+    function updateCount() {
+      totalDisplay.textContent = allTasks.length;
+      if (allTasks.length === 0) {
+        emptyMsg.style.display = "block";
+      } else {
+        emptyMsg.style.display = "none";
+      }
+    }
+
+    // add a new task to the list
+    function addTask() {
+      let taskText = taskInput.value.trim();
+
+      // don't add if the input is empty
+      if (taskText === "") {
+        return;
+      }
+
+      // bonus: add to array
+      allTasks.push(taskText);
+
+      // create the list item
+      let newItem = document.createElement("li");
+
+      // create span for the task text
+      let textSpan = document.createElement("span");
+      textSpan.classList.add("task-text");
+      textSpan.textContent = taskText;
+
+      // clicking the task marks it as done or undone
+      newItem.addEventListener("click", function() {
+        newItem.classList.toggle("done");
+      });
+
+      // create a delete button
+      let deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "Delete";
+      deleteBtn.classList.add("delete-btn");
+
+      deleteBtn.addEventListener("click", function(e) {
+        // stop click from also toggling done on the task
+        e.stopPropagation();
+
+        // remove from array
+        let index = allTasks.indexOf(taskText);
+        if (index !== -1) {
+          allTasks.splice(index, 1);
+        }
+
+        // remove from page
+        newItem.remove();
+
+        // update the count
+        updateCount();
+      });
+
+      // put the span and button inside the li
+      newItem.appendChild(textSpan);
+      newItem.appendChild(deleteBtn);
+      myList.appendChild(newItem);
+
+      // clear the input
+      taskInput.value = "";
+
+      // update count
+      updateCount();
+    }
+
+    // add task when button is clicked
+    addBtn.addEventListener("click", function() {
+      addTask();
+    });
+
+    // also add task when Enter is pressed
+    taskInput.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        addTask();
+      }
+    });
+  </script>
+</body>
+</html>
